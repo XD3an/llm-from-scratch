@@ -28,8 +28,8 @@ class TrainingConfig:
     BATCH_SIZE: int = 4
     CONTEXT_LENGTH: int = 16
     LEARNING_RATE: float = 1e-3
-    EPOCHS: int = 10
-    EVAL_INTERVAL: int = 50
+    EPOCHS: int = 2
+    EVAL_INTERVAL: int = 500
     DEVICE: str = 'cuda' if torch.cuda.is_available() else 'cpu'
     TORCH_SEED: int = 1337
 
@@ -51,13 +51,21 @@ def estimate_loss(model, train_data, val_data, config):
     out = {}
     model.eval()
     
-    for split, data in [('train', train_data), ('val', val_data)]:
-        losses = torch.zeros(config.EVAL_ITERS)
-        for k in range(config.EVAL_ITERS):
-            x_batch, y_batch = get_batch(data, config)
-            _, loss = model(x_batch, y_batch)
-            losses[k] = loss.item()
-        out[f'{split}_loss'] = losses.mean().item()
+    # Estimate loss on training set
+    train_loss = 0
+    for i in range(0, len(train_data), config.BATCH_SIZE):
+        x_batch, y_batch = get_batch(train_data, config)
+        _, loss = model(x_batch, y_batch)
+        train_loss += loss.item()
+    out['train_loss'] = train_loss / len(train_data)
+    
+    # Estimate loss on validation set
+    val_loss = 0
+    for i in range(0, len(val_data), config.BATCH_SIZE):
+        x_batch, y_batch = get_batch(val_data, config)
+        _, loss = model(x_batch, y_batch)
+        val_loss += loss.item()
+    out['val_loss'] = val_loss / len(val_data)
     
     model.train()
     return out
@@ -132,7 +140,12 @@ def main():
     
     # 6. Save the model
     os.makedirs('./model', exist_ok=True)
-    torch.save(model.state_dict(), './model/model.pth')
+    torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': loss,
+        }, './model/model.pth')
     logger.info("Model training completed and saved.")
     
     # Calculate and log the number of parameters
