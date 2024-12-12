@@ -2,9 +2,20 @@ import os
 import math
 import requests
 import torch
+from datasets import load_dataset
 
+def load_data_with_huggingface():
+    """
+    Load training data using Hugging Face Datasets
+    
+    Returns:
+        str: Loaded text data
+    """
+    dataset = load_dataset('goendalf666/sales-textbook_for_convincing_and_selling')
+    print(f"Dataset loaded: {dataset}")
+    return dataset
 
-def load_data(url='https://huggingface.co/datasets/goendalf666/sales-textbook_for_convincing_and_selling/resolve/main/sales_textbook.txt?download=true'):
+def load_data_with_url(url='https://huggingface.co/datasets/goendalf666/sales-textbook_for_convincing_and_selling/resolve/main/sales_textbook.txt?download=true'):
     """
     Load training data, downloading if not exists
     
@@ -83,3 +94,10 @@ def get_batch(data, config):
     ]).to(config.DEVICE)
     
     return x_batch, y_batch
+
+if __name__=='__main__':
+    raw_data = load_data_with_huggingface()
+    if raw_data is None:
+        print("Failed to load training data")
+    print(f"Data loaded: {len(raw_data)} tokens")
+    print(raw_data['train']['text'])
