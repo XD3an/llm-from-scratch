@@ -28,7 +28,7 @@ class TrainingConfig:
     BATCH_SIZE: int = 4
     CONTEXT_LENGTH: int = 16
     LEARNING_RATE: float = 1e-3
-    EPOCHS: int = 2
+    EPOCHS: int = 10
     EVAL_INTERVAL: int = 500
     DEVICE: str = 'cuda' if torch.cuda.is_available() else 'cpu'
     TORCH_SEED: int = 1337
