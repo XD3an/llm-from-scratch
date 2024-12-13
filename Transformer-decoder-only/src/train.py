@@ -140,12 +140,7 @@ def main():
     
     # 6. Save the model
     os.makedirs('./model', exist_ok=True)
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss,
-        }, './model/model.pth')
+    torch.save(model.state_dict(), './model/model.pth')
     logger.info("Model training completed and saved.")
     
     # Calculate and log the number of parameters
