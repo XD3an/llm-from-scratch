@@ -4,7 +4,7 @@ import requests
 import torch
 from datasets import load_dataset
 
-def load_data_with_huggingface(path='goendalf666/sales-textbook_for_convincing_and_selling'):
+def load_data_with_huggingface(path: str):
     """
     Load training data using Hugging Face Datasets
     
@@ -15,10 +15,9 @@ def load_data_with_huggingface(path='goendalf666/sales-textbook_for_convincing_a
         str: Loaded text data
     """
     dataset = load_dataset(path)
-    print(f"Dataset loaded: {dataset}")
     return dataset
 
-def load_data_with_url(url='https://huggingface.co/datasets/goendalf666/sales-textbook_for_convincing_and_selling/resolve/main/sales_textbook.txt?download=true'):
+def load_data_with_url(url: str):
     """
     Load training data, downloading if not exists
     
@@ -41,6 +40,7 @@ def load_data_with_url(url='https://huggingface.co/datasets/goendalf666/sales-te
                 f.write(response.content)
             
             print("Dataset downloaded successfully")
+            
         except requests.exceptions.RequestException as e:
             print(f"Download failed: {e}")
             return None
@@ -99,7 +99,7 @@ def get_batch(data, config):
     return x_batch, y_batch
 
 if __name__=='__main__':
-    raw_data = load_data_with_huggingface('schuler/cosmopedia-v2-textbook-and-howto-2.3m')
+    raw_data = load_data_with_huggingface('goendalf666/sales-textbook_for_convincing_and_selling')
     if raw_data is None:
         print("Failed to load training data")
     print(f"Data loaded: {len(raw_data)} tokens")

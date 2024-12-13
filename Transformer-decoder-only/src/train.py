@@ -5,10 +5,11 @@ import requests
 import torch
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
+import json
 
 from model import Model
 from utils import load_data_with_url, load_data_with_huggingface, prepare_data, get_batch
-from tokenizer import TextTokenizer, tokenize_data
+from tokenizer import TextTokenizer
 from parameters import calculate_parameters
 
 # Configure logging
@@ -16,22 +17,28 @@ logging.basicConfig(
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s: %(message)s',
     handlers=[
-        logging.FileHandler('./logs/training.log'),
+        logging.FileHandler("./logs/training.log"),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
 
 # Hyperparameters
+# Load configuration
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
 class TrainingConfig:
-    """Configuration for model training"""
-    BATCH_SIZE: int = 4
-    CONTEXT_LENGTH: int = 16
-    LEARNING_RATE: float = 1e-3
-    EPOCHS: int = 10
-    EVAL_INTERVAL: int = 500
-    DEVICE: str = 'cuda' if torch.cuda.is_available() else 'cpu'
-    TORCH_SEED: int = 1337
+    BATCH_SIZE = config['train']['batch_size']
+    EPOCHS = config['train']['epochs']
+    LEARNING_RATE = config['train']['learning_rate']
+    EVAL_INTERVAL = config['train']['eval_interval']
+    CONTEXT_LENGTH = config['train']['context_length']
+    SEED = config['train']['seed']
+    DATASET_PATH = config['train']['dataset_path']
+    MODEL_PATH = config['train']['model_path']
+    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 
 @torch.no_grad()
@@ -74,13 +81,13 @@ def main():
     """Main training script"""
     
     # Set random seed for reproducibility
-    torch.manual_seed(TrainingConfig.TORCH_SEED)
+    torch.manual_seed(TrainingConfig.SEED)
     
     # # Initialize TensorBoard writer
     # writer = SummaryWriter('runs/sales_llm_experiment')
     
     # 1. Load and prepare data
-    raw_data = str(load_data_with_huggingface()['train']['text'])
+    raw_data = str(load_data_with_huggingface(path=TrainingConfig.DATASET_PATH)['train']['text'])
     if raw_data is None:
         logger.error("Failed to load training data")
         return
@@ -140,11 +147,11 @@ def main():
     
     # 6. Save the model
     os.makedirs('./model', exist_ok=True)
-    torch.save(model.state_dict(), './model/model.pth')
+    torch.save(model.state_dict(), TrainingConfig.MODEL_PATH)
     logger.info("Model training completed and saved.")
     
     # Calculate and log the number of parameters
-    total_params = calculate_parameters(model)
+    total_params = calculate_parameters(model=model, path=TrainingConfig.MODEL_PATH)
     logger.info(f"Total parameters: {total_params}")
     
     # # Close TensorBoard writer

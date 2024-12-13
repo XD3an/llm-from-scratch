@@ -11,7 +11,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class TextGenerator:
-    def __init__(self, model_path='./model/model.pth', device=None):
+    def __init__(self, model_path, device=None):
         """
         Initialize text generator
         
@@ -33,7 +33,7 @@ class TextGenerator:
             raise
     
     def generate_text(self, 
-                      prompt="The product is", 
+                      prompt="", 
                       max_tokens=100, 
                       temperature=0.7, 
                       top_k=50):
@@ -57,7 +57,7 @@ class TextGenerator:
             x = torch.tensor(tokenized_prompt, dtype=torch.long).unsqueeze(0).to(self.device)
             
             # Generate tokens
-            y = self.model.generate(x, max_new_tokens=100)
+            y = self.model.generate(x, max_new_tokens=max_tokens)
             
             # Decode tokens
             generated_text = self.tokenizer.decode(y.squeeze().tolist())
@@ -71,12 +71,12 @@ class TextGenerator:
 def main():
     """Main text generation script"""
     try:
-        generator = TextGenerator()
+        generator = TextGenerator(model_path='./model/model.pth')
         
         # Example prompts for generation
         prompt = str(input("Enter a prompt: "))
         
-        print(f"\n--- Generating from prompt: '{prompt}' ---")
+        print(f"\nGenerating text from prompt: {prompt}\n")
         generated_text = generator.generate_text(prompt)
         print(generated_text)
     

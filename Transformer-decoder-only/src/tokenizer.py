@@ -47,26 +47,3 @@ class TextTokenizer:
         except Exception as e:
             print(f"Decoding error: {e}")
             return ""
-
-def tokenize_data(data):
-    """
-    Global tokenization function with additional error handling
-    
-    Args:
-        data (str): Text to tokenize
-    
-    Returns:
-        list: Tokenized data
-    """
-    try:
-        tokenizer = TextTokenizer()
-        tokenized_data = tokenizer.tokenize(data)
-        
-        # Optional: Track max token value if needed
-        global max_token_value
-        max_token_value = max(tokenized_data) if tokenized_data else 0
-        
-        return tokenized_data
-    except Exception as e:
-        print(f"Data tokenization failed: {e}")
-        return []
