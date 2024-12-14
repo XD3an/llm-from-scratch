@@ -9,12 +9,15 @@
     },
     "train":{
         "batch_size": 4,
-        "epochs": 1,
+        "epochs": 5,
         "learning_rate": 1e-3,
         "eval_interval": 1000,
         "context_length": 16,
-        "dataset_path": "goendalf666/sales-textbook_for_convincing_and_selling",
+        "dataset_path": "nampdn-ai/tiny-strange-textbooks",
         "model_path": "./model/model.pth",
         "seed": 1337
+    },
+    "huggingface-token": {
+        "access_token": "YOUR_HUGGING_FACE_ACCESS_TOKEN"
     }
 }
