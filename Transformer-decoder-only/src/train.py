@@ -86,16 +86,23 @@ def main():
     # # Initialize TensorBoard writer
     # writer = SummaryWriter('runs/sales_llm_experiment')
     
-    # 1. Load and prepare data
-    raw_data = str(load_data_with_huggingface(path=TrainingConfig.DATASET_PATH)['train']['text'])
+    # 1. Load and prepare data (parquet format)
+    raw_data = load_data_with_huggingface(path=TrainingConfig.DATASET_PATH)
+    
+    textbook = []
+    for i in range(0, len(raw_data['train'])):
+        textbook.append(raw_data['train'][i]['text'])
+    
+    textbook = ' '.join(textbook)
+    
     if raw_data is None:
         logger.error("Failed to load training data")
         return
-    logger.info(f"Data loaded: {len(raw_data)} tokens")
+    logger.info(f"Data loaded: {len(textbook)} tokens")
     
     # 2. Tokenize data
     tokenizer = TextTokenizer(encoding_name="cl100k_base")
-    tokenized_data = tokenizer.tokenize(raw_data)
+    tokenized_data = tokenizer.tokenize(textbook)
     train_data, val_data = prepare_data(tokenized_data)   # Split data into train and validation (80/20)
     logger.info(f"Data split: Train {len(train_data)} tokens, Validation {len(val_data)} tokens")
     

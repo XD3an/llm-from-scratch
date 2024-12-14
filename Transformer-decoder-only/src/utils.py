@@ -3,6 +3,14 @@ import math
 import requests
 import torch
 from datasets import load_dataset
+from huggingface_hub import login
+import json
+
+with open("config.json", "r") as f:
+    config = json.load(f)
+
+login(config['huggingface-token']['access_token']) if config['huggingface-token']['access_token'] else None
+
 
 def load_data_with_huggingface(path: str):
     """
