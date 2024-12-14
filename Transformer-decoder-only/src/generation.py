@@ -77,7 +77,7 @@ def main():
         prompt = str(input("Enter a prompt: "))
         
         print(f"\nGenerating text from prompt: {prompt}\n")
-        generated_text = generator.generate_text(prompt)
+        generated_text = generator.generate_text(prompt, max_tokens=100, temperature=0.7, top_k=50)
         print(generated_text)
     
     except Exception as e:
