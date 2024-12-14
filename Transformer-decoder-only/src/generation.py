@@ -57,7 +57,7 @@ class TextGenerator:
             x = torch.tensor(tokenized_prompt, dtype=torch.long).unsqueeze(0).to(self.device)
             
             # Generate tokens
-            y = self.model.generate(x, max_new_tokens=max_tokens)
+            y = self.model.generate(x, max_new_tokens=max_tokens, temperature=temperature, top_k=top_k)
             
             # Decode tokens
             generated_text = self.tokenizer.decode(y.squeeze().tolist())
