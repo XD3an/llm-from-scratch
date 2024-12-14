@@ -6,7 +6,6 @@ from torch.nn import functional as F
 import json
 
 # Huperparameters
-
 with open('config.json', 'r') as f:
     config = json.load(f)
 class ModelConfig:
@@ -18,8 +17,6 @@ class ModelConfig:
     NUM_HEADS: int = config['model']['num_heads']               # Number of heads in multi-head attention (must divide D_MODEL)
     DROP_OUT: float = config['model']['dropout']                # Drop out rate for regularization (default: 0.1)
     DEVICE: str = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-# config = ModelConfig()
 
 
 class FeedForwardNetwork(nn.Module):
@@ -129,20 +126,15 @@ class Model(nn.Module):
             loss = None
         return logits, loss
 
-    def generate(self, idx, max_new_tokens=100):
-        # idx is (B, T) array of token in the current context
+    def generate(self, idx, max_new_tokens=100, temperature=1.0, top_k=50):
         for _ in range(max_new_tokens):
-            # crop the context to the last CONTEXT_LENGTH tokens
             idx_crop = idx[:, -min(ModelConfig.CONTEXT_LENGTH, idx.size(1)):]
-            # get the prediction for the next token
             logits, _ = self.forward(idx_crop)
-            # get the last time step from the logits where the dimension of the logits are (B, T, C)
-            logits_last_timestep = logits[:, -1, :]
-            # apply softmax to the logits
-            probs = F.softmax(logits_last_timestep, dim=-1)
-            # get the token with the highest probability
-            idx_new_token = torch.multinomial(probs, num_samples=1)
-            # append the new token to the context
-            idx = torch.cat((idx, idx_new_token), dim=1)
-        
+            logits = logits[:, -1, :] / temperature
+            if top_k > 0:
+                values, indices = torch.topk(logits, top_k)
+                logits[logits < values[:, [-1]]] = -float('Inf')
+            probs = F.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, idx_next), dim=1)
         return idx
