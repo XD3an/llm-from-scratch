@@ -1,8 +1,12 @@
 import tiktoken
+import json
 
+
+with open("config.json", "r") as f:
+    config = json.load(f)
 
 class TextTokenizer:
-    def __init__(self, encoding_name="cl100k_base"):
+    def __init__(self, encoding_name=config['tokenizer']['encoding_name']):
         """
         Initialize tokenizer with optional encoding selection
         

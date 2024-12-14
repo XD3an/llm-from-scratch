@@ -77,7 +77,7 @@ def prepare_data(data, train_split=0.8):
     print(f"Data split: Train {len(train_data)} tokens, Validation {len(val_data)} tokens")
     return train_data, val_data
 
-def get_batch(data, config):
+def get_batch(data, context_length, batch_size, device):
     """
     Generate training batches
     
@@ -90,18 +90,18 @@ def get_batch(data, config):
     """
     idxs = torch.randint(
         low=0, 
-        high=len(data) - config.CONTEXT_LENGTH - 1, 
-        size=(config.BATCH_SIZE,)
+        high=len(data) - context_length - 1, 
+        size=(batch_size,)
     )
     x_batch = torch.stack([
-        torch.tensor(data[idx:idx+config.CONTEXT_LENGTH]) 
+        torch.tensor(data[idx:idx+context_length]) 
         for idx in idxs
-    ]).to(config.DEVICE)
+    ]).to(device)
     
     y_batch = torch.stack([
-        torch.tensor(data[idx+1:idx+config.CONTEXT_LENGTH+1]) 
+        torch.tensor(data[idx+1:idx+context_length+1]) 
         for idx in idxs
-    ]).to(config.DEVICE)
+    ]).to(device)
     
     return x_batch, y_batch
 
