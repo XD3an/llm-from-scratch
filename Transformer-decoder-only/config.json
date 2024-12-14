@@ -7,13 +7,16 @@
         "num_heads": 4,
         "dropout": 0.1
     },
+    "tokenizer":{
+        "encoding_name": "cl100k_base"
+    },
     "train":{
         "batch_size": 4,
         "epochs": 5,
         "learning_rate": 1e-3,
         "eval_interval": 1000,
         "context_length": 16,
-        "dataset_path": "nampdn-ai/tiny-strange-textbooks",
+        "dataset_path": "goendalf666/sales-textbook_for_convincing_and_selling",
         "model_path": "./model/model.pth",
         "seed": 1337
     },
